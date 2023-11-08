@@ -27,7 +27,7 @@ func NewApplication(quotesfile, sourceURL string) *Application {
 }
 
 type HomeTemplateData struct {
-	Quote     template.HTML
+	Wrapped   template.HTML
 	SourceURL string
 }
 
@@ -39,7 +39,7 @@ func (a *Application) Home() http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		templateData := HomeTemplateData{
-			Quote:     a.quotesfile.GetRandomQuote().HTML(),
+			Wrapped:   a.quotesfile.GetRandomQuote().HTML(),
 			SourceURL: a.sourceURL,
 		}
 		if err := template.ExecuteTemplate(w, "home.html", templateData); err != nil {

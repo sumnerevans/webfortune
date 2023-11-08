@@ -18,21 +18,26 @@ type Quote struct {
 
 func (q Quote) Text() string {
 	var builder strings.Builder
-	for _, line := range q.quote {
+	for i, line := range q.quote {
 		builder.WriteString(line)
-		builder.WriteString("\n")
+		if i < len(q.quote)-1 {
+			builder.WriteString("\n")
+		}
 	}
 
 	if q.source != "" {
-		sourceContextStr := wordwrap.WrapString(q.source, 65)
-		for i, s := range strings.Split(sourceContextStr, "\n") {
+		builder.WriteString("\n")
+		sourceLines := strings.Split(wordwrap.WrapString(q.source, 65), "\n")
+		for i, s := range sourceLines {
 			if i == 0 {
 				builder.WriteString("    -- ")
 			} else {
 				builder.WriteString("       ")
 			}
 			builder.WriteString(s)
-			builder.WriteString("\n")
+			if i < len(sourceLines)-1 {
+				builder.WriteString("\n")
+			}
 		}
 	}
 
@@ -41,9 +46,10 @@ func (q Quote) Text() string {
 
 func (q Quote) HTML() template.HTML {
 	var builder strings.Builder
-	builder.WriteString(`<figure id="quote" class="quote p-4 m-0 shadow" `)
-	builder.WriteString(`hx-get="/html" hx-target="#quote" hx-swap="outerHTML" `)
-	builder.WriteString(`title="click for another quote">`)
+	builder.WriteString(`<div id="plain-quote" class="d-none">`)
+	builder.WriteString(q.Text())
+	builder.WriteString(`</div>`)
+	builder.WriteString(`<figure id="quote" class="quote p-4 m-0 shadow">`)
 	builder.WriteString("<blockquote>")
 	builder.WriteString(strings.Join(q.quote, "<br>"))
 	builder.WriteString("</blockquote>")
