@@ -12,3 +12,4 @@ Use the following environment variables to configure webfortune:
   the same way as `strfile`.
 * `QUOTESFILE_SOURCE_URL` --- a URL pointing to the source of the quotesfile
   (optional).
+* `PLAUSIBLE_DOMAIN` --- the `data-domain` value for Plausible analytics.

@@ -15,20 +15,23 @@ import (
 var TemplateFS embed.FS
 
 type Application struct {
-	quotesfile *Quotesfile
-	sourceURL  string
+	quotesfile      *Quotesfile
+	sourceURL       string
+	plausibleDomain string
 }
 
-func NewApplication(quotesfile, sourceURL string) *Application {
+func NewApplication(quotesfile string) *Application {
 	return &Application{
-		quotesfile: NewQuotesfile(quotesfile),
-		sourceURL:  sourceURL,
+		quotesfile:      NewQuotesfile(quotesfile),
+		sourceURL:       os.Getenv("QUOTESFILE_SOURCE_URL"),
+		plausibleDomain: os.Getenv("PLAUSIBLE_DOMAIN"),
 	}
 }
 
 type HomeTemplateData struct {
-	Wrapped   template.HTML
-	SourceURL string
+	Wrapped         template.HTML
+	SourceURL       string
+	PlausibleDomain string
 }
 
 func (a *Application) Home() http.HandlerFunc {
@@ -39,8 +42,9 @@ func (a *Application) Home() http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		templateData := HomeTemplateData{
-			Wrapped:   a.quotesfile.GetRandomQuote().HTML(),
-			SourceURL: a.sourceURL,
+			Wrapped:         a.quotesfile.GetRandomQuote().HTML(),
+			SourceURL:       a.sourceURL,
+			PlausibleDomain: a.plausibleDomain,
 		}
 		if err := template.ExecuteTemplate(w, "home.html", templateData); err != nil {
 			log.Err(err).Msg("Failed to execute the template")
@@ -92,7 +96,7 @@ func main() {
 		log.Fatal().Msg("QUOTESFILE not set")
 	}
 
-	app := NewApplication(quotesfile, os.Getenv("QUOTESFILE_SOURCE_URL"))
+	app := NewApplication(quotesfile)
 
 	listen := os.Getenv("LISTEN_ADDR")
 	app.Start(listen)
