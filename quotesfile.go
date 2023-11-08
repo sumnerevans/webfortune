@@ -12,8 +12,9 @@ import (
 )
 
 type Quote struct {
-	quote  []string
-	source string
+	quote        []string
+	spaceEscaped []string
+	source       string
 }
 
 func (q Quote) Text() string {
@@ -51,7 +52,7 @@ func (q Quote) HTML() template.HTML {
 	builder.WriteString(`</div>`)
 	builder.WriteString(`<figure id="quote" class="quote p-4 m-0">`)
 	builder.WriteString(`<blockquote class="m-0">`)
-	builder.WriteString(strings.Join(q.quote, "<br>"))
+	builder.WriteString(strings.Join(q.spaceEscaped, "<br>"))
 	builder.WriteString("</blockquote>")
 	if q.source != "" {
 		builder.WriteString(`<figcaption class="mt-3">`)
@@ -100,6 +101,7 @@ func NewQuotesfile(quotesfile string) *Quotesfile {
 			quote.source = text[7:]
 		} else {
 			quote.quote = append(quote.quote, text)
+			quote.spaceEscaped = append(quote.spaceEscaped, strings.ReplaceAll(text, " ", "&nbsp;"))
 		}
 	}
 	if err := scanner.Err(); err != nil {
