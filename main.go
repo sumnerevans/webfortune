@@ -55,7 +55,7 @@ func (a *Application) Home() http.HandlerFunc {
 func (a *Application) AllQuotes(w http.ResponseWriter, r *http.Request) {
 	for _, quote := range a.quotesfile.quotes {
 		w.Write([]byte(quote.Text()))
-		w.Write([]byte("%\n"))
+		w.Write([]byte("\n%\n"))
 	}
 }
 
