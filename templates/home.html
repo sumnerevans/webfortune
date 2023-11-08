@@ -1,15 +1,18 @@
 <!DOCTYPE html>
-<html lang="en" class="h-100">
+<html lang="en" class="h-100" data-bs-theme="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
-    <meta name="description" content="Sumner's personal homepage" />
+    <meta
+      name="description"
+      content="A simple random quote from a quotesfile"
+    />
     <title>Web Fortune</title>
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
-      integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
       crossorigin="anonymous"
     />
     <link
@@ -44,7 +47,7 @@
       class="h-100 d-flex flex-column align-items-center justify-content-center"
     >
       <div class="flex-grow-1"></div>
-      <div id="quote-wrapper">{{ .Wrapped }}</div>
+      <div class="card shadow" id="quote-wrapper">{{ .Wrapped }}</div>
       <div class="mt-4 d-flex flex-row align-items-center">
         <button
           class="btn btn-sm btn-outline-secondary float-right mx-2"

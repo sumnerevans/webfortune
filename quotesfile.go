@@ -49,7 +49,7 @@ func (q Quote) HTML() template.HTML {
 	builder.WriteString(`<div id="plain-quote" class="d-none">`)
 	builder.WriteString(q.Text())
 	builder.WriteString(`</div>`)
-	builder.WriteString(`<figure id="quote" class="quote p-4 m-0 shadow">`)
+	builder.WriteString(`<figure id="quote" class="quote p-4 m-0">`)
 	builder.WriteString("<blockquote>")
 	builder.WriteString(strings.Join(q.quote, "<br>"))
 	builder.WriteString("</blockquote>")
