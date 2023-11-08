@@ -14,8 +14,8 @@
         in
         {
           packages = rec {
-            default = homepage;
-            homepage = pkgs.buildGoModule rec {
+            default = webfortune;
+            webfortune = pkgs.buildGoModule rec {
               pname = "webfortune";
               version = "unstable-2023-11-07";
               src = self;
