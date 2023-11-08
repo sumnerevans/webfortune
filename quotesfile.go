@@ -50,11 +50,11 @@ func (q Quote) HTML() template.HTML {
 	builder.WriteString(q.Text())
 	builder.WriteString(`</div>`)
 	builder.WriteString(`<figure id="quote" class="quote p-4 m-0">`)
-	builder.WriteString("<blockquote>")
+	builder.WriteString(`<blockquote class="m-0">`)
 	builder.WriteString(strings.Join(q.quote, "<br>"))
 	builder.WriteString("</blockquote>")
 	if q.source != "" {
-		builder.WriteString("<figcaption>")
+		builder.WriteString(`<figcaption class="mt-3">`)
 		sourceContextStr := wordwrap.WrapString(q.source, 65)
 		for i, s := range strings.Split(sourceContextStr, "\n") {
 			if i == 0 {
