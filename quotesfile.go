@@ -51,16 +51,18 @@ func (q Quote) Text() string {
 	return builder.String()
 }
 
+func (q Quote) Permalink(hostRoot string) string {
+	hash := q.Hash()
+	return hostRoot + "/?id=" + hex.EncodeToString(hash[:])
+}
+
 func (q Quote) HTML(hostRoot string) template.HTML {
 	var builder strings.Builder
 	builder.WriteString(`<div id="plain-quote" class="d-none">`)
 	builder.WriteString(q.Text())
 	builder.WriteString(`</div>`)
 	builder.WriteString(`<div id="quote-hash" class="d-none">`)
-	builder.WriteString(hostRoot)
-	builder.WriteString("/?id=")
-	hash := q.Hash()
-	builder.WriteString(hex.EncodeToString(hash[:]))
+	builder.WriteString(q.Permalink(hostRoot))
 	builder.WriteString(`</div>`)
 	builder.WriteString(`<figure id="quote" class="quote p-4 m-0">`)
 	builder.WriteString(`<blockquote class="m-0">`)

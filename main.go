@@ -55,6 +55,8 @@ func (a *Application) Home() http.HandlerFunc {
 		}
 		if !ok {
 			quote = a.quotesfile.GetRandomQuote()
+			http.Redirect(w, r, quote.Permalink(a.hostRoot), http.StatusFound)
+			return
 		}
 
 		templateData := HomeTemplateData{
@@ -80,7 +82,9 @@ func (a *Application) RawQuote(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Application) HTMLQuote(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte(a.quotesfile.GetRandomQuote().HTML(a.hostRoot)))
+	quote := a.quotesfile.GetRandomQuote()
+	w.Header().Set("HX-Replace-Url", quote.Permalink(a.hostRoot))
+	w.Write([]byte(quote.HTML(a.hostRoot)))
 }
 
 func (a *Application) Start(listen string) {
