@@ -60,19 +60,19 @@
           <i class="fa fa-link"></i>
         </button>
         <button
-          class="btn btn-sm btn-outline-secondary float-right mx-2"
-          title="copy quote to clipboard"
-          onclick="navigator.clipboard.writeText(document.getElementById('plain-quote').innerText)"
-        >
-          <i class="fa fa-clipboard"></i>
-        </button>
-        <button
-          class="btn btn-sm btn-outline-secondary float-right mx-2"
+          class="btn btn-lg btn-outline-success float-right mx-4"
           title="click for another quote"
           hx-get="/html"
           hx-target="#quote-wrapper"
         >
           <i class="fa fa-refresh"></i>
+        </button>
+        <button
+          class="btn btn-sm btn-outline-secondary float-right mx-2"
+          title="copy quote to clipboard"
+          onclick="navigator.clipboard.writeText(document.getElementById('plain-quote').innerText)"
+        >
+          <i class="fa fa-clipboard"></i>
         </button>
       </div>
       <div class="flex-grow-1"></div>
