@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"encoding/hex"
 	"html/template"
 	"net/http"
 	"os"
@@ -18,13 +19,15 @@ type Application struct {
 	quotesfile      *Quotesfile
 	sourceURL       string
 	plausibleDomain string
+	hostRoot        string
 }
 
-func NewApplication(quotesfile string) *Application {
+func NewApplication(quotesfile, hostRoot string) *Application {
 	return &Application{
 		quotesfile:      NewQuotesfile(quotesfile),
 		sourceURL:       os.Getenv("QUOTESFILE_SOURCE_URL"),
 		plausibleDomain: os.Getenv("PLAUSIBLE_DOMAIN"),
+		hostRoot:        hostRoot,
 	}
 }
 
@@ -41,8 +44,21 @@ func (a *Application) Home() http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		quoteHash := r.URL.Query().Get("id")
+		var quote Quote
+		var ok bool
+		if len(quoteHash) == 32 {
+			hash, err := hex.DecodeString(quoteHash)
+			if err == nil {
+				quote, ok = a.quotesfile.GetQuoteByHash([16]byte(hash))
+			}
+		}
+		if !ok {
+			quote = a.quotesfile.GetRandomQuote()
+		}
+
 		templateData := HomeTemplateData{
-			Wrapped:         a.quotesfile.GetRandomQuote().HTML(),
+			Wrapped:         quote.HTML(a.hostRoot),
 			SourceURL:       a.sourceURL,
 			PlausibleDomain: a.plausibleDomain,
 		}
@@ -64,7 +80,7 @@ func (a *Application) RawQuote(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Application) HTMLQuote(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte(a.quotesfile.GetRandomQuote().HTML()))
+	w.Write([]byte(a.quotesfile.GetRandomQuote().HTML(a.hostRoot)))
 }
 
 func (a *Application) Start(listen string) {
@@ -96,8 +112,12 @@ func main() {
 		log.Fatal().Msg("QUOTESFILE not set")
 	}
 
-	app := NewApplication(quotesfile)
-
 	listen := os.Getenv("LISTEN_ADDR")
+	hostRoot := os.Getenv("HOST_ROOT")
+	if hostRoot == "" {
+		hostRoot = listen
+	}
+
+	app := NewApplication(quotesfile, hostRoot)
 	app.Start(listen)
 }

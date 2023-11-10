@@ -2,6 +2,8 @@ package main
 
 import (
 	"bufio"
+	"crypto/md5"
+	"encoding/hex"
 	"html/template"
 	"math/rand"
 	"os"
@@ -15,6 +17,10 @@ type Quote struct {
 	quote        []string
 	spaceEscaped []string
 	source       string
+}
+
+func (q Quote) Hash() [16]byte {
+	return md5.Sum([]byte(q.Text()))
 }
 
 func (q Quote) Text() string {
@@ -45,10 +51,16 @@ func (q Quote) Text() string {
 	return builder.String()
 }
 
-func (q Quote) HTML() template.HTML {
+func (q Quote) HTML(hostRoot string) template.HTML {
 	var builder strings.Builder
 	builder.WriteString(`<div id="plain-quote" class="d-none">`)
 	builder.WriteString(q.Text())
+	builder.WriteString(`</div>`)
+	builder.WriteString(`<div id="quote-hash" class="d-none">`)
+	builder.WriteString(hostRoot)
+	builder.WriteString("/?id=")
+	hash := q.Hash()
+	builder.WriteString(hex.EncodeToString(hash[:]))
 	builder.WriteString(`</div>`)
 	builder.WriteString(`<figure id="quote" class="quote p-4 m-0">`)
 	builder.WriteString(`<blockquote class="m-0">`)
@@ -74,6 +86,7 @@ func (q Quote) HTML() template.HTML {
 
 type Quotesfile struct {
 	quotes []Quote
+	byHash map[[16]byte]Quote
 }
 
 func NewQuotesfile(quotesfile string) *Quotesfile {
@@ -87,11 +100,13 @@ func NewQuotesfile(quotesfile string) *Quotesfile {
 
 	scanner := bufio.NewScanner(file)
 	var quote Quote
+	byHash := map[[16]byte]Quote{}
 	var inSource bool
 	for scanner.Scan() {
 		text := scanner.Text()
 		if text == "%" {
 			quotes = append(quotes, quote)
+			byHash[quote.Hash()] = quote
 			quote = Quote{}
 			inSource = false
 		} else if inSource {
@@ -108,9 +123,17 @@ func NewQuotesfile(quotesfile string) *Quotesfile {
 		log.Fatal().Err(err).Msg("Failed to read quotes file")
 	}
 
-	return &Quotesfile{quotes: quotes}
+	return &Quotesfile{
+		quotes: quotes,
+		byHash: byHash,
+	}
 }
 
 func (q *Quotesfile) GetRandomQuote() Quote {
 	return q.quotes[rand.Intn(len(q.quotes))]
+}
+
+func (q *Quotesfile) GetQuoteByHash(hash [16]byte) (Quote, bool) {
+	quote, ok := q.byHash[hash]
+	return quote, ok
 }

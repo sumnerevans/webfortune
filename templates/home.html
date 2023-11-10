@@ -54,6 +54,13 @@
       <div class="mt-4 d-flex flex-row align-items-center">
         <button
           class="btn btn-sm btn-outline-secondary float-right mx-2"
+          title="copy permalink to clipboard"
+          onclick="navigator.clipboard.writeText(document.getElementById('quote-hash').innerText)"
+        >
+          <i class="fa fa-link"></i>
+        </button>
+        <button
+          class="btn btn-sm btn-outline-secondary float-right mx-2"
           title="copy quote to clipboard"
           onclick="navigator.clipboard.writeText(document.getElementById('plain-quote').innerText)"
         >
