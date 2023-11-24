@@ -3,49 +3,41 @@ package main
 import (
 	"embed"
 	"encoding/hex"
-	"html/template"
 	"net/http"
 	"os"
 	"time"
 
+	"github.com/a-h/templ"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+
+	"github.com/sumnerevans/webfortune/quotesfile"
+	"github.com/sumnerevans/webfortune/templates"
 )
 
 //go:embed templates/*
 var TemplateFS embed.FS
 
 type Application struct {
-	quotesfile      *Quotesfile
-	sourceURL       string
+	quotesfile      *quotesfile.Quotesfile
+	sourceURL       templ.SafeURL
 	plausibleDomain string
 	hostRoot        string
 }
 
-func NewApplication(quotesfile, hostRoot string) *Application {
+func NewApplication(quotesfilePath, hostRoot string) *Application {
 	return &Application{
-		quotesfile:      NewQuotesfile(quotesfile),
-		sourceURL:       os.Getenv("QUOTESFILE_SOURCE_URL"),
+		quotesfile:      quotesfile.NewQuotesfile(quotesfilePath),
+		sourceURL:       templ.URL(os.Getenv("QUOTESFILE_SOURCE_URL")),
 		plausibleDomain: os.Getenv("PLAUSIBLE_DOMAIN"),
 		hostRoot:        hostRoot,
 	}
 }
 
-type HomeTemplateData struct {
-	Wrapped         template.HTML
-	SourceURL       string
-	PlausibleDomain string
-}
-
 func (a *Application) Home() http.HandlerFunc {
-	template, err := template.ParseFS(TemplateFS, "templates/home.html")
-	if err != nil {
-		log.Fatal().Err(err).Msg("failed to parse template")
-	}
-
 	return func(w http.ResponseWriter, r *http.Request) {
 		quoteHash := r.URL.Query().Get("id")
-		var quote Quote
+		var quote quotesfile.Quote
 		var ok bool
 		if len(quoteHash) == 32 {
 			hash, err := hex.DecodeString(quoteHash)
@@ -59,19 +51,20 @@ func (a *Application) Home() http.HandlerFunc {
 			return
 		}
 
-		templateData := HomeTemplateData{
-			Wrapped:         quote.HTML(a.hostRoot),
-			SourceURL:       a.sourceURL,
+		err := templates.Home(templates.PageParameters{
+			HostRoot:        a.hostRoot,
 			PlausibleDomain: a.plausibleDomain,
-		}
-		if err := template.ExecuteTemplate(w, "home.html", templateData); err != nil {
+			Quote:           quote,
+			SourceURL:       a.sourceURL,
+		}).Render(r.Context(), w)
+		if err != nil {
 			log.Err(err).Msg("Failed to execute the template")
 		}
 	}
 }
 
 func (a *Application) AllQuotes(w http.ResponseWriter, r *http.Request) {
-	for _, quote := range a.quotesfile.quotes {
+	for _, quote := range a.quotesfile.AllQuotes() {
 		w.Write([]byte(quote.Text()))
 		w.Write([]byte("\n%\n"))
 	}
@@ -84,13 +77,15 @@ func (a *Application) RawQuote(w http.ResponseWriter, r *http.Request) {
 func (a *Application) HTMLQuote(w http.ResponseWriter, r *http.Request) {
 	quote := a.quotesfile.GetRandomQuote()
 	w.Header().Set("HX-Replace-Url", quote.Permalink(a.hostRoot))
-	w.Write([]byte(quote.HTML(a.hostRoot)))
+	if err := templates.Quote(a.hostRoot, quote).Render(r.Context(), w); err != nil {
+		log.Err(err).Msg("Failed to execute the template")
+	}
 }
 
 func (a *Application) Start(listen string) {
 	log.Info().Msg("Starting router")
 
-	http.HandleFunc("/", a.Home())
+	http.Handle("/", a.Home())
 	http.HandleFunc("/all", a.AllQuotes)
 	http.HandleFunc("/raw", a.RawQuote)
 	http.HandleFunc("/html", a.HTMLQuote)
