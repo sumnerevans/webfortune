@@ -2,6 +2,8 @@
 
 A simple website that shows a random quote from a quotesfile.
 
+![screenshot of the webfortune interface](./screenshot.png)
+
 ## Usage
 
 Use the following environment variables to configure webfortune:
