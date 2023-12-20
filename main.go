@@ -1,7 +1,6 @@
 package main
 
 import (
-	"embed"
 	"encoding/hex"
 	"net/http"
 	"os"
@@ -14,9 +13,6 @@ import (
 	"github.com/sumnerevans/webfortune/quotesfile"
 	"github.com/sumnerevans/webfortune/templates"
 )
-
-//go:embed templates/*
-var TemplateFS embed.FS
 
 type Application struct {
 	quotesfile      *quotesfile.Quotesfile
