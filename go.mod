@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/a-h/templ v0.2.513
 	github.com/mitchellh/go-wordwrap v1.0.1
-	github.com/rs/zerolog v1.31.0
+	github.com/rs/zerolog v1.32.0
 )
 
 require (
