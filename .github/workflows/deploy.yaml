@@ -3,6 +3,9 @@ name: Lint and Build
 on:
   push:
 
+env:
+  GO_VERSION: "1.22"
+
 jobs:
   lint:
     runs-on: ubuntu-latest
