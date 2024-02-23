@@ -22,7 +22,7 @@ templ monospaceStyle() {
 	</style>
 }
 
-templ head(plausibleDomain string) {
+templ head(plausibleDomain, goatcounterDomain string) {
 	<head>
 		<meta charset="utf-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -49,20 +49,24 @@ templ head(plausibleDomain string) {
 		if plausibleDomain != "" {
 			<script defer data-domain={ plausibleDomain } src="https://plausible.io/js/script.js"></script>
 		}
+		if goatcounterDomain != "" {
+			<script data-goatcounter={ goatcounterDomain } async src="//gc.zgo.at/count.js"></script>
+		}
 	</head>
 }
 
 type PageParameters struct {
-	HostRoot        string
-	PlausibleDomain string
-	Quote           quotesfile.Quote
-	SourceURL       templ.SafeURL
+	HostRoot          string
+	PlausibleDomain   string
+	GoatcounterDomain string
+	Quote             quotesfile.Quote
+	SourceURL         templ.SafeURL
 }
 
 templ Home(params PageParameters) {
 	<!DOCTYPE html>
 	<html lang="en" class="h-100" data-bs-theme="dark">
-		@head(params.PlausibleDomain)
+		@head(params.PlausibleDomain, params.GoatcounterDomain)
 		<body class="h-100">
 			<div
  				class="h-100 d-flex flex-column align-items-center justify-content-center"

@@ -15,18 +15,20 @@ import (
 )
 
 type Application struct {
-	quotesfile      *quotesfile.Quotesfile
-	sourceURL       templ.SafeURL
-	plausibleDomain string
-	hostRoot        string
+	quotesfile        *quotesfile.Quotesfile
+	sourceURL         templ.SafeURL
+	plausibleDomain   string
+	goatcounterDomain string
+	hostRoot          string
 }
 
 func NewApplication(quotesfilePath, hostRoot string) *Application {
 	return &Application{
-		quotesfile:      quotesfile.NewQuotesfile(quotesfilePath),
-		sourceURL:       templ.URL(os.Getenv("QUOTESFILE_SOURCE_URL")),
-		plausibleDomain: os.Getenv("PLAUSIBLE_DOMAIN"),
-		hostRoot:        hostRoot,
+		quotesfile:        quotesfile.NewQuotesfile(quotesfilePath),
+		sourceURL:         templ.URL(os.Getenv("QUOTESFILE_SOURCE_URL")),
+		plausibleDomain:   os.Getenv("PLAUSIBLE_DOMAIN"),
+		goatcounterDomain: os.Getenv("GOATCOUNTER_DOMAIN"),
+		hostRoot:          hostRoot,
 	}
 }
 
@@ -48,10 +50,11 @@ func (a *Application) Home() http.HandlerFunc {
 		}
 
 		err := templates.Home(templates.PageParameters{
-			HostRoot:        a.hostRoot,
-			PlausibleDomain: a.plausibleDomain,
-			Quote:           quote,
-			SourceURL:       a.sourceURL,
+			HostRoot:          a.hostRoot,
+			PlausibleDomain:   a.plausibleDomain,
+			GoatcounterDomain: a.goatcounterDomain,
+			Quote:             quote,
+			SourceURL:         a.sourceURL,
 		}).Render(r.Context(), w)
 		if err != nil {
 			log.Err(err).Msg("Failed to execute the template")
