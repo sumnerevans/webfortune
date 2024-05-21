@@ -1,8 +1,6 @@
 package templates
 
-import (
-	"github.com/sumnerevans/webfortune/quotesfile"
-)
+import "github.com/sumnerevans/webfortune/quotesfile"
 
 templ monospaceStyle() {
 	<style>
@@ -11,53 +9,45 @@ templ monospaceStyle() {
 		font-style: normal;
 		font-display: swap;
 		font-weight: 400;
-		src: url(https://cdn.jsdelivr.net/fontsource/fonts/iosevka@latest/latin-400-normal.woff2)
-				format("woff2"),
-			url(https://cdn.jsdelivr.net/fontsource/fonts/iosevka@latest/latin-400-normal.woff)
-				format("woff");
+		src: url(https://cdn.jsdelivr.net/fontsource/fonts/iosevka@latest/latin-400-normal.woff2) format("woff2"),
+			url(https://cdn.jsdelivr.net/fontsource/fonts/iosevka@latest/latin-400-normal.woff) format("woff");
 	}
+
 	body {
 		font-family: Iosevka, monospace;
 	}
-	</style>
+</style>
 }
 
-templ head(plausibleDomain, goatcounterDomain string) {
+templ head(goatcounterDomain string) {
 	<head>
 		<meta charset="utf-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
 		<meta name="theme-color" content="#000000"/>
-		<meta
- 			name="description"
- 			content="A simple random quote from a quotesfile"
-		/>
+		<meta name="description" content="A simple random quote from a quotesfile"/>
 		<title>Web Fortune</title>
 		<link
- 			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
- 			rel="stylesheet"
- 			integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
- 			crossorigin="anonymous"
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+			integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+			crossorigin="anonymous"
 		/>
 		<link
- 			rel="stylesheet"
- 			href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css"
- 			integrity="sha256-XoaMnoYC5TH6/+ihMEnospgm0J1PM/nioxbOUdnM8HY="
- 			crossorigin="anonymous"
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css"
+			integrity="sha256-XoaMnoYC5TH6/+ihMEnospgm0J1PM/nioxbOUdnM8HY="
+			crossorigin="anonymous"
 		/>
 		@monospaceStyle()
 		<script src="https://unpkg.com/htmx.org@1.9.8" integrity="sha384-rgjA7mptc2ETQqXoYC3/zJvkU7K/aP44Y+z7xQuJiVnB/422P/Ak+F/AqFR7E4Wr" crossorigin="anonymous"></script>
-		if plausibleDomain != "" {
-			<script defer data-domain={ plausibleDomain } src="https://plausible.io/js/script.js"></script>
-		}
 		if goatcounterDomain != "" {
-			<script data-goatcounter={ goatcounterDomain } async src="//gc.zgo.at/count.js"></script>
+			<script data-goatcounter={ goatcounterDomain } async src="https://gc.zgo.at/count.js"></script>
 		}
 	</head>
 }
 
 type PageParameters struct {
 	HostRoot          string
-	PlausibleDomain   string
 	GoatcounterDomain string
 	Quote             quotesfile.Quote
 	SourceURL         templ.SafeURL
@@ -66,35 +56,33 @@ type PageParameters struct {
 templ Home(params PageParameters) {
 	<!DOCTYPE html>
 	<html lang="en" class="h-100" data-bs-theme="dark">
-		@head(params.PlausibleDomain, params.GoatcounterDomain)
+		@head(params.GoatcounterDomain)
 		<body class="h-100">
-			<div
- 				class="h-100 d-flex flex-column align-items-center justify-content-center"
-			>
+			<div class="h-100 d-flex flex-column align-items-center justify-content-center">
 				<div class="flex-grow-1"></div>
 				<div class="card shadow" id="quote-wrapper">
 					@Quote(params.HostRoot, params.Quote)
 				</div>
 				<div class="mt-4 d-flex flex-row align-items-center">
 					<button
- 						class="btn btn-sm btn-outline-secondary float-right mx-2"
- 						title="copy permalink to clipboard"
- 						onclick="navigator.clipboard.writeText(document.getElementById('quote-hash').innerText)"
+						class="btn btn-sm btn-outline-secondary float-right mx-2"
+						title="copy permalink to clipboard"
+						onclick="navigator.clipboard.writeText(document.getElementById('quote-hash').innerText)"
 					>
 						<i class="fa fa-link"></i>
 					</button>
 					<button
- 						class="btn btn-lg btn-outline-success float-right mx-4"
- 						title="click for another quote"
- 						hx-get="/html"
- 						hx-target="#quote-wrapper"
+						class="btn btn-lg btn-outline-success float-right mx-4"
+						title="click for another quote"
+						hx-get="/html"
+						hx-target="#quote-wrapper"
 					>
 						<i class="fa fa-refresh"></i>
 					</button>
 					<button
- 						class="btn btn-sm btn-outline-secondary float-right mx-2"
- 						title="copy quote to clipboard"
- 						onclick="navigator.clipboard.writeText(document.getElementById('plain-quote').innerText)"
+						class="btn btn-sm btn-outline-secondary float-right mx-2"
+						title="copy quote to clipboard"
+						onclick="navigator.clipboard.writeText(document.getElementById('plain-quote').innerText)"
 					>
 						<i class="fa fa-clipboard"></i>
 					</button>

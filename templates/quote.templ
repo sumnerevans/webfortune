@@ -1,8 +1,6 @@
 package templates
 
-import (
-	"github.com/sumnerevans/webfortune/quotesfile"
-)
+import "github.com/sumnerevans/webfortune/quotesfile"
 
 templ Quote(hostRoot string, quote quotesfile.Quote) {
 	<div id="plain-quote" class="d-none">{ quote.Text() }</div>
