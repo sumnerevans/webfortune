@@ -5,7 +5,7 @@ go 1.24.0
 toolchain go1.24.12
 
 require (
-	github.com/a-h/templ v0.3.977
+	github.com/a-h/templ v0.3.1001
 	github.com/mitchellh/go-wordwrap v1.0.1
 	github.com/rs/zerolog v1.34.0
 )
