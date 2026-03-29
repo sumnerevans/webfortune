@@ -72,11 +72,11 @@
     },
     "nixpkgs-unstable": {
       "locked": {
-        "lastModified": 1766902085,
-        "narHash": "sha256-coBu0ONtFzlwwVBzmjacUQwj3G+lybcZ1oeNSQkgC0M=",
+        "lastModified": 1771848320,
+        "narHash": "sha256-0MAd+0mun3K/Ns8JATeHT1sX28faLII5hVLq0L3BdZU=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "c0b0e0fddf73fd517c3471e546c0df87a42d53f4",
+        "rev": "2fc6539b481e1d2569f25f8799236694180c0993",
         "type": "github"
       },
       "original": {
@@ -103,16 +103,16 @@
         "version": "version"
       },
       "locked": {
-        "lastModified": 1767212439,
-        "narHash": "sha256-KABEveISMy31B4kXoYY5IwFouoI4L9Jco5qMcnpeL2s=",
+        "lastModified": 1772282016,
+        "narHash": "sha256-146QxN+osvlzp8NTGm5TN2yvbu3cOodXfIVeIKsS+7I=",
         "owner": "a-h",
         "repo": "templ",
-        "rev": "1031b47010ec8f5edea09466df6294ef81c93053",
+        "rev": "5ddd784440b232930161d76c7ca85d922fdcf183",
         "type": "github"
       },
       "original": {
         "owner": "a-h",
-        "ref": "v0.3.977",
+        "ref": "v0.3.1001",
         "repo": "templ",
         "type": "github"
       }

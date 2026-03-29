@@ -5,7 +5,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
     templ = {
-      url = "github:a-h/templ/v0.3.977";
+      url = "github:a-h/templ/v0.3.1001";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -36,9 +36,9 @@
             default = webfortune;
             webfortune = pkgs.buildGoModule {
               pname = "webfortune";
-              version = "unstable-2024-10-23";
+              version = "unstable-2026-03-28";
               src = self;
-              vendorHash = "sha256-fPkJYxLxw4KE+Bj4tTs2RBSb7Q+b7/nag0tYaqWkS1I=";
+              vendorHash = "sha256-TbhmISlpIJp+mkTY2Y5EiLPIMZ83JpyNHrgGKtfztfw=";
 
               preBuild = ''
                 ${pkgs.templ}/bin/templ generate
