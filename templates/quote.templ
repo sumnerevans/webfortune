@@ -2,10 +2,13 @@ package templates
 
 import "github.com/sumnerevans/webfortune/quotesfile"
 
-templ Quote(hostRoot string, quote quotesfile.Quote) {
+templ QuoteMetadata(hostRoot string, quote quotesfile.Quote) {
 	<div id="plain-quote" class="d-none">{ quote.Text() }</div>
-	<div id="quote-hash" class="d-none">{ quote.Permalink(hostRoot) }</div>
-	<figure id="quote" class="quote p-4 m-0">
+	<div id="quote-permalink" class="d-none">{ quote.Permalink(hostRoot) }</div>
+}
+
+templ Quote(quote quotesfile.Quote) {
+	<figure id={ "quote-" + quote.HashString() } class="quote p-4 m-0">
 		<blockquote class="m-0">
 			@quote.QuoteHTML()
 		</blockquote>

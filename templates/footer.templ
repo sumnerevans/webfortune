@@ -1,0 +1,14 @@
+package templates
+
+templ Footer(params *PageParameters) {
+	<footer class="p-4 text-secondary">
+		if params.Copyright != "" {
+			&copy; { params.Copyright }.
+		}
+		View the
+		<a href="https://github.com/sumnerevans/webfortune" target="_blank">site source code</a>.
+		if params.SourceURL != "" {
+			View the <a href={ params.SourceURL } target="_blank">quotesfile</a>.
+		}
+	</footer>
+}

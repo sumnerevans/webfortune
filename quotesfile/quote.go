@@ -21,6 +21,11 @@ func (q Quote) Hash() [16]byte {
 	return md5.Sum([]byte(q.Text()))
 }
 
+func (q Quote) HashString() string {
+	hash := q.Hash()
+	return hex.EncodeToString(hash[:])
+}
+
 func (q Quote) Text() string {
 	var builder strings.Builder
 	for i, line := range q.quote {
@@ -90,6 +95,5 @@ func (q Quote) QuoteHTML() templ.Component {
 }
 
 func (q Quote) Permalink(hostRoot string) string {
-	hash := q.Hash()
-	return hostRoot + "/?id=" + hex.EncodeToString(hash[:])
+	return hostRoot + "/?id=" + q.HashString()
 }

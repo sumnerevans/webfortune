@@ -38,7 +38,7 @@
               pname = "webfortune";
               version = "unstable-2026-04-22";
               src = self;
-              vendorHash = "sha256-gSMAaPHSx79D3rEO10pV4sQG9EQ/X/Q793pUNuyUK5o=";
+              vendorHash = "sha256-aCbQJOH3782mDUS1lZAvOepzhL2s8bDlqWgKkfncS3A=";
 
               preBuild = ''
                 ${pkgs.templ}/bin/templ generate

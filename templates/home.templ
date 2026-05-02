@@ -1,7 +1,5 @@
 package templates
 
-import "github.com/sumnerevans/webfortune/quotesfile"
-
 templ monospaceStyle() {
 	<style>
 	@font-face {
@@ -15,6 +13,10 @@ templ monospaceStyle() {
 
 	body {
 		font-family: Iosevka, monospace;
+	}
+
+	.quote-wrapper .quote {
+		width: 78ch;
 	}
 </style>
 }
@@ -46,28 +48,26 @@ templ head(goatcounterDomain string) {
 	</head>
 }
 
-type PageParameters struct {
-	HostRoot          string
-	GoatcounterDomain string
-	Quote             quotesfile.Quote
-	SourceURL         templ.SafeURL
-}
-
-templ Home(params PageParameters) {
+templ Home(params HomePageParameters) {
 	<!DOCTYPE html>
 	<html lang="en" class="h-100" data-bs-theme="dark">
 		@head(params.GoatcounterDomain)
 		<body class="h-100">
 			<div class="h-100 d-flex flex-column align-items-center justify-content-center">
+				<header class="p-4 text-secondary">
+					View
+					<a href="/all">all the quotes</a>.
+				</header>
 				<div class="flex-grow-1"></div>
-				<div class="card shadow" id="quote-wrapper">
-					@Quote(params.HostRoot, params.Quote)
+				<div class="card shadow quote-wrapper" id="quote-wrapper">
+					@QuoteMetadata(params.HostRoot, params.Quote)
+					@Quote(params.Quote)
 				</div>
 				<div class="mt-4 d-flex flex-row align-items-center">
 					<button
 						class="btn btn-sm btn-outline-secondary float-right mx-2"
 						title="copy permalink to clipboard"
-						onclick="navigator.clipboard.writeText(document.getElementById('quote-hash').innerText)"
+						onclick="navigator.clipboard.writeText(document.getElementById('quote-permalink').innerText)"
 					>
 						<i class="fa fa-link"></i>
 					</button>
@@ -88,14 +88,7 @@ templ Home(params PageParameters) {
 					</button>
 				</div>
 				<div class="flex-grow-1"></div>
-				<footer class="p-4 text-secondary">
-					&copy; Sumner Evans 2023.
-					View the
-					<a href="https://github.com/sumnerevans/webfortune" target="_blank">site source code</a>.
-					if params.SourceURL != "" {
-						View the <a href={ params.SourceURL } target="_blank">quotesfile</a>.
-					}
-				</footer>
+				@Footer(params.PageParameters)
 			</div>
 		</body>
 	</html>

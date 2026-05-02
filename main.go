@@ -15,18 +15,19 @@ import (
 )
 
 type Application struct {
-	quotesfile        *quotesfile.Quotesfile
-	sourceURL         templ.SafeURL
-	goatcounterDomain string
-	hostRoot          string
+	quotesfile     *quotesfile.Quotesfile
+	pageParameters *templates.PageParameters
 }
 
 func NewApplication(quotesfilePath, hostRoot string) *Application {
 	return &Application{
-		quotesfile:        quotesfile.NewQuotesfile(quotesfilePath),
-		sourceURL:         templ.URL(os.Getenv("QUOTESFILE_SOURCE_URL")),
-		goatcounterDomain: os.Getenv("GOATCOUNTER_DOMAIN"),
-		hostRoot:          hostRoot,
+		quotesfile: quotesfile.NewQuotesfile(quotesfilePath),
+		pageParameters: &templates.PageParameters{
+			Copyright:         os.Getenv("COPYRIGHT"),
+			SourceURL:         templ.URL(os.Getenv("QUOTESFILE_SOURCE_URL")),
+			GoatcounterDomain: os.Getenv("GOATCOUNTER_DOMAIN"),
+			HostRoot:          hostRoot,
+		},
 	}
 }
 
@@ -43,15 +44,13 @@ func (a *Application) Home() http.HandlerFunc {
 		}
 		if !ok {
 			quote = a.quotesfile.GetRandomQuote()
-			http.Redirect(w, r, quote.Permalink(a.hostRoot), http.StatusFound)
+			http.Redirect(w, r, quote.Permalink(a.pageParameters.HostRoot), http.StatusFound)
 			return
 		}
 
-		err := templates.Home(templates.PageParameters{
-			HostRoot:          a.hostRoot,
-			GoatcounterDomain: a.goatcounterDomain,
-			Quote:             quote,
-			SourceURL:         a.sourceURL,
+		err := templates.Home(templates.HomePageParameters{
+			PageParameters: a.pageParameters,
+			Quote:          quote,
 		}).Render(r.Context(), w)
 		if err != nil {
 			log.Err(err).Msg("Failed to execute the template")
@@ -60,9 +59,13 @@ func (a *Application) Home() http.HandlerFunc {
 }
 
 func (a *Application) AllQuotes(w http.ResponseWriter, r *http.Request) {
-	for _, quote := range a.quotesfile.AllQuotes() {
-		w.Write([]byte(quote.Text()))
-		w.Write([]byte("\n%\n"))
+	quotes := a.quotesfile.AllQuotes()
+	err := templates.AllQuotes(templates.AllPageParameters{
+		PageParameters: a.pageParameters,
+		Quotes:         quotes,
+	}).Render(r.Context(), w)
+	if err != nil {
+		log.Err(err).Msg("Failed to execute the template")
 	}
 }
 
@@ -72,8 +75,11 @@ func (a *Application) RawQuote(w http.ResponseWriter, r *http.Request) {
 
 func (a *Application) HTMLQuote(w http.ResponseWriter, r *http.Request) {
 	quote := a.quotesfile.GetRandomQuote()
-	w.Header().Set("HX-Push-Url", quote.Permalink(a.hostRoot))
-	if err := templates.Quote(a.hostRoot, quote).Render(r.Context(), w); err != nil {
+	w.Header().Set("HX-Push-Url", quote.Permalink(a.pageParameters.HostRoot))
+	if err := templates.QuoteMetadata(a.pageParameters.HostRoot, quote).Render(r.Context(), w); err != nil {
+		log.Err(err).Msg("Failed to execute the template")
+	}
+	if err := templates.Quote(quote).Render(r.Context(), w); err != nil {
 		log.Err(err).Msg("Failed to execute the template")
 	}
 }
