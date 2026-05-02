@@ -1,7 +1,7 @@
 package templates
 
 templ Footer(params *PageParameters) {
-	<footer class="p-4 text-secondary">
+	<footer class="p-4 text-secondary text-center">
 		if params.Copyright != "" {
 			&copy; { params.Copyright }.
 		}

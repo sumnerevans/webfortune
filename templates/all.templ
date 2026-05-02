@@ -7,19 +7,23 @@ templ AllQuotes(params AllPageParameters) {
 		<body class="h-100">
 			<div class="mt-4 d-flex flex-column align-items-center justify-content-center">
 				for _, quote := range params.Quotes {
-					<div class="d-flex flex-row align-items-center justify-content-center">
-						<div
-							class="card shadow quote-wrapper my-2"
-							role="button"
-							onclick={ templ.JSFuncCall("window.location.assign", quote.Permalink(params.HostRoot)) }
-							title="click to view quote on its own page"
-						>
-							@Quote(quote)
+					<div class="overflow-x-auto w-100 px-4 d-flex flex-row">
+						<div class="flex-grow-1"></div>
+						<div class="d-flex flex-row align-items-center justify-content-center">
+							<div
+								class="card shadow quote-wrapper my-2"
+								role="button"
+								onclick={ templ.JSFuncCall("window.location.assign", quote.Permalink(params.HostRoot)) }
+								title="click to view quote on its own page"
+							>
+								@Quote(quote)
+							</div>
+							<div class="mx-4 d-flex flex-column align-items-center">
+								@PermalinkButton(params.HostRoot, quote)
+								@CopyQuoteButton(quote)
+							</div>
 						</div>
-						<div class="ms-4 d-flex flex-column align-items-center">
-							@PermalinkButton(params.HostRoot, quote)
-							@CopyQuoteButton(quote)
-						</div>
+						<div class="flex-grow-1"></div>
 					</div>
 				}
 				@Footer(params.PageParameters)
