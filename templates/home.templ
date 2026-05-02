@@ -60,33 +60,9 @@ templ Home(params HomePageParameters) {
 				</header>
 				<div class="flex-grow-1"></div>
 				<div class="card shadow quote-wrapper" id="quote-wrapper">
-					@QuoteMetadata(params.HostRoot, params.Quote)
 					@Quote(params.Quote)
 				</div>
-				<div class="mt-4 d-flex flex-row align-items-center">
-					<button
-						class="btn btn-sm btn-outline-secondary float-right mx-2"
-						title="copy permalink to clipboard"
-						onclick="navigator.clipboard.writeText(document.getElementById('quote-permalink').innerText)"
-					>
-						<i class="fa fa-link"></i>
-					</button>
-					<button
-						class="btn btn-lg btn-outline-success float-right mx-4"
-						title="click for another quote"
-						hx-get="/html"
-						hx-target="#quote-wrapper"
-					>
-						<i class="fa fa-refresh"></i>
-					</button>
-					<button
-						class="btn btn-sm btn-outline-secondary float-right mx-2"
-						title="copy quote to clipboard"
-						onclick="navigator.clipboard.writeText(document.getElementById('plain-quote').innerText)"
-					>
-						<i class="fa fa-clipboard"></i>
-					</button>
-				</div>
+				@QuoteButtons(params.HostRoot, params.Quote)
 				<div class="flex-grow-1"></div>
 				@Footer(params.PageParameters)
 			</div>

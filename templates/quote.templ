@@ -2,16 +2,46 @@ package templates
 
 import "github.com/sumnerevans/webfortune/quotesfile"
 
-templ QuoteMetadata(hostRoot string, quote quotesfile.Quote) {
-	<div id="plain-quote" class="d-none">{ quote.Text() }</div>
-	<div id="quote-permalink" class="d-none">{ quote.Permalink(hostRoot) }</div>
-}
-
 templ Quote(quote quotesfile.Quote) {
-	<figure id={ "quote-" + quote.HashString() } class="quote p-4 m-0">
+	<figure class="quote p-4 m-0">
 		<blockquote class="m-0">
 			@quote.QuoteHTML()
 		</blockquote>
 		@quote.SourceHTML()
 	</figure>
+}
+
+templ QuoteButtons(hostRoot string, quote quotesfile.Quote) {
+	<div id="quote-buttons" class="mt-4 d-flex flex-row align-items-center" hx-swap-oob="true">
+		@PermalinkButton(hostRoot, quote)
+		<button
+			class="btn btn-lg btn-outline-success float-right mx-4"
+			title="click for another quote"
+			hx-get="/html"
+			hx-target="#quote-wrapper"
+		>
+			<i class="fa fa-refresh"></i>
+		</button>
+		@CopyQuoteButton(quote)
+	</div>
+}
+
+templ PermalinkButton(hostRoot string, quote quotesfile.Quote) {
+	<button
+		class="btn btn-sm btn-outline-secondary float-right m-2"
+		title="copy permalink to clipboard"
+		onclick={ templ.JSFuncCall("navigator.clipboard.writeText", quote.Permalink(hostRoot)) }
+	>
+		<i class="fa fa-link"></i>
+	</button>
+}
+
+templ CopyQuoteButton(quote quotesfile.Quote) {
+	<button
+		class="btn btn-sm btn-outline-secondary float-right m-2"
+		title="copy quote to clipboard"
+		onclick={ templ.JSFuncCall("navigator.clipboard.writeText", quote.Text()) }
+	>
+		<i class="fa fa-clipboard"></i>
+	</button>
 }

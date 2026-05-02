@@ -76,7 +76,7 @@ func (a *Application) RawQuote(w http.ResponseWriter, r *http.Request) {
 func (a *Application) HTMLQuote(w http.ResponseWriter, r *http.Request) {
 	quote := a.quotesfile.GetRandomQuote()
 	w.Header().Set("HX-Push-Url", quote.Permalink(a.pageParameters.HostRoot))
-	if err := templates.QuoteMetadata(a.pageParameters.HostRoot, quote).Render(r.Context(), w); err != nil {
+	if err := templates.QuoteButtons(a.pageParameters.HostRoot, quote).Render(r.Context(), w); err != nil {
 		log.Err(err).Msg("Failed to execute the template")
 	}
 	if err := templates.Quote(quote).Render(r.Context(), w); err != nil {

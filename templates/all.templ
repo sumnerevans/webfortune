@@ -5,27 +5,20 @@ templ AllQuotes(params AllPageParameters) {
 	<html lang="en" class="h-100" data-bs-theme="dark">
 		@head(params.GoatcounterDomain)
 		<body class="h-100">
-			<div class="d-flex flex-column align-items-center justify-content-center">
+			<div class="mt-4 d-flex flex-column align-items-center justify-content-center">
 				for _, quote := range params.Quotes {
 					<div class="d-flex flex-row align-items-center justify-content-center">
-						<div class="card shadow quote-wrapper my-2">
+						<div
+							class="card shadow quote-wrapper my-2"
+							role="button"
+							onclick={ templ.JSFuncCall("window.location.assign", quote.Permalink(params.HostRoot)) }
+							title="click to view quote on its own page"
+						>
 							@Quote(quote)
 						</div>
 						<div class="ms-4 d-flex flex-column align-items-center">
-							<button
-								class="btn btn-sm btn-outline-secondary float-right my-2"
-								title="go to quote"
-								onclick={ templ.JSFuncCall("window.location.assign", quote.Permalink(params.HostRoot)) }
-							>
-								<i class="fa fa-link"></i>
-							</button>
-							<button
-								class="btn btn-sm btn-outline-secondary float-right my-2"
-								title="copy quote to clipboard"
-								onclick={ templ.JSFuncCall("navigator.clipboard.writeText", quote.Text()) }
-							>
-								<i class="fa fa-clipboard"></i>
-							</button>
+							@PermalinkButton(params.HostRoot, quote)
+							@CopyQuoteButton(quote)
 						</div>
 					</div>
 				}
