@@ -24,6 +24,8 @@ jobs:
           go install honnef.co/go/tools/cmd/staticcheck@latest
           export PATH="$HOME/go/bin:$PATH"
 
+      - run: go generate ./...
+
       - name: Run pre-commit
         uses: pre-commit/action@v3.0.1
 
@@ -37,5 +39,7 @@ jobs:
         with:
           go-version: ${{ env.GO_VERSION }}
           cache: true
+
+      - run: go generate ./...
 
       - run: go build
