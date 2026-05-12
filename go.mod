@@ -3,7 +3,7 @@ module github.com/sumnerevans/webfortune
 go 1.25.0
 
 require (
-	github.com/a-h/templ v0.3.1001
+	github.com/a-h/templ v0.3.1020
 	github.com/mitchellh/go-wordwrap v1.0.1
 	github.com/rs/zerolog v1.35.1
 )
@@ -19,7 +19,7 @@ require (
 	github.com/mattn/go-isatty v0.0.22 // indirect
 	github.com/natefinch/atomic v1.0.1 // indirect
 	golang.org/x/mod v0.26.0 // indirect
-	golang.org/x/net v0.42.0 // indirect
+	golang.org/x/net v0.51.0 // indirect
 	golang.org/x/sync v0.16.0 // indirect
 	golang.org/x/sys v0.43.0 // indirect
 	golang.org/x/tools v0.35.0 // indirect
