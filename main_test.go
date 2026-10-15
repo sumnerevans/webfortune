@@ -31,7 +31,7 @@ func TestQuoteOpenGraphMetadata(t *testing.T) {
 				t.Error("response missing Web Fortune page title")
 			}
 			for _, tag := range []string{
-				`<meta property="og:title" content="` + quote.Text() + ` | Web Fortune"`,
+				`<meta property="og:title" content="Web Fortune"`,
 				`<meta property="og:description" content="` + quote.Text() + `"`,
 				`<meta property="og:url" content="` + url + `"`,
 				`<link rel="canonical" href="` + url + `"`,

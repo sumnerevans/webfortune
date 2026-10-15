@@ -45,7 +45,7 @@ templ styles() {
 	</style>
 }
 
-templ head(goatcounterDomain, title, description, canonicalURL, imageURL string, imageWidth, imageHeight int, imageAlt string) {
+templ head(goatcounterDomain, description, canonicalURL, imageURL string, imageWidth, imageHeight int, imageAlt string) {
 	<head>
 		<meta charset="utf-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -53,7 +53,7 @@ templ head(goatcounterDomain, title, description, canonicalURL, imageURL string,
 		<meta name="description" content={ description }/>
 		<title>Web Fortune</title>
 		<link rel="canonical" href={ canonicalURL }/>
-		<meta property="og:title" content={ title }/>
+		<meta property="og:title" content="Web Fortune"/>
 		<meta property="og:type" content="website"/>
 		<meta property="og:url" content={ canonicalURL }/>
 		<meta property="og:description" content={ description }/>

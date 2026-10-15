@@ -32,14 +32,3 @@ func quoteDescription(quote quotesfile.Quote) string {
 	}
 	return string(description)
 }
-
-func quoteTitle(quote quotesfile.Quote) string {
-	description := []rune(quoteDescription(quote))
-	if len(description) > 80 {
-		return string(description[:79]) + "… | Web Fortune"
-	}
-	if len(description) == 0 {
-		return "Quote | Web Fortune"
-	}
-	return string(description) + " | Web Fortune"
-}
