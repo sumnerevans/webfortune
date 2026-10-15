@@ -21,6 +21,7 @@ templ AllQuotes(params AllPageParameters) {
 							<div class="mx-4 d-flex flex-column align-items-center">
 								@PermalinkButton(params.HostRoot, quote)
 								@CopyQuoteButton(quote)
+								@GetImageButton(params.HostRoot, quote)
 							</div>
 						</div>
 						<div class="flex-grow-1"></div>

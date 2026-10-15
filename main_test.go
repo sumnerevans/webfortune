@@ -36,12 +36,32 @@ func TestQuoteOpenGraphMetadata(t *testing.T) {
 				`<meta property="og:url" content="` + url + `"`,
 				`<link rel="canonical" href="` + url + `"`,
 				`<meta property="og:image" content="` + quote.OGImageURL(app.pageParameters.HostRoot) + `"`,
+				`href="` + quote.OGImageURL(app.pageParameters.HostRoot) + `" download="` + quote.HashString() + `.png"`,
 			} {
 				if !strings.Contains(body, tag) {
 					t.Errorf("response missing %q", tag)
 				}
 			}
 		})
+	}
+}
+
+func TestAllQuotesImageDownloadLinks(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "quotes")
+	if err := os.WriteFile(path, []byte("First quote\n%\nSecond quote\n%\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	app := NewApplication(path, "https://fortune.example")
+	response := httptest.NewRecorder()
+	app.AllQuotes(response, httptest.NewRequest(http.MethodGet, "https://fortune.example/all", nil))
+	if response.Code != http.StatusOK {
+		t.Fatalf("status = %d, want 200", response.Code)
+	}
+	for _, quote := range app.quotesfile.AllQuotes() {
+		link := `href="` + quote.OGImageURL(app.pageParameters.HostRoot) + `" download="` + quote.HashString() + `.png"`
+		if !strings.Contains(response.Body.String(), link) {
+			t.Errorf("all quotes page missing image download link %q", link)
+		}
 	}
 }
 
