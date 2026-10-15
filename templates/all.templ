@@ -3,7 +3,7 @@ package templates
 templ AllQuotes(params AllPageParameters) {
 	<!DOCTYPE html>
 	<html lang="en" class="h-100" data-bs-theme="dark">
-		@head(params.GoatcounterDomain)
+		@head(params.GoatcounterDomain, "All Quotes | Web Fortune", "Browse all quotes on Web Fortune.", params.HostRoot + "/all", params.HostRoot + "/og-image.png", 1006, 616, "Screenshot of the Web Fortune quote page")
 		<body class="h-100">
 			<div class="mt-4 d-flex flex-column align-items-center justify-content-center">
 				for _, quote := range params.Quotes {

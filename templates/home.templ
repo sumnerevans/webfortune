@@ -3,7 +3,7 @@ package templates
 templ Home(params HomePageParameters) {
 	<!DOCTYPE html>
 	<html lang="en" class="h-100" data-bs-theme="dark">
-		@head(params.GoatcounterDomain)
+		@head(params.GoatcounterDomain, quoteTitle(params.Quote), quoteDescription(params.Quote), params.Quote.Permalink(params.HostRoot), params.Quote.OGImageURL(params.HostRoot), 1200, 630, "Image of the quote on Web Fortune")
 		<body class="h-100">
 			<div class="h-100 d-flex flex-column align-items-center">
 				<header class="p-4 text-secondary">

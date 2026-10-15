@@ -26,6 +26,14 @@ func (q Quote) HashString() string {
 	return hex.EncodeToString(hash[:])
 }
 
+func (q Quote) BodyText() string {
+	return strings.Join(q.quote, "\n")
+}
+
+func (q Quote) Source() string {
+	return q.source
+}
+
 func (q Quote) Text() string {
 	var builder strings.Builder
 	for i, line := range q.quote {
@@ -96,4 +104,8 @@ func (q Quote) QuoteHTML() templ.Component {
 
 func (q Quote) Permalink(hostRoot string) string {
 	return hostRoot + "/?id=" + q.HashString()
+}
+
+func (q Quote) OGImageURL(hostRoot string) string {
+	return hostRoot + "/og/v6/" + q.HashString() + ".png"
 }
