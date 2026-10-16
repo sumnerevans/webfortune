@@ -103,7 +103,7 @@ func (q Quote) QuoteHTML() templ.Component {
 }
 
 func (q Quote) Permalink(hostRoot string) string {
-	return hostRoot + "/?id=" + q.HashString()
+	return hostRoot + "/q/" + q.HashString()
 }
 
 func (q Quote) OGImageURL(hostRoot string) string {

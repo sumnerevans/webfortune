@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/sumnerevans/webfortune/quotesfile"
 )
 
 func TestQuoteOpenGraphMetadata(t *testing.T) {
@@ -17,12 +19,16 @@ func TestQuoteOpenGraphMetadata(t *testing.T) {
 		t.Fatal(err)
 	}
 	app := NewApplication(path, "https://fortune.example")
+	routes := app.routes()
 
 	for _, quote := range app.quotesfile.AllQuotes() {
 		t.Run(quote.Text(), func(t *testing.T) {
-			url := quote.Permalink(app.pageParameters.HostRoot)
+			url := "https://fortune.example/q/" + quote.HashString()
+			if got := quote.Permalink(app.pageParameters.HostRoot); got != url {
+				t.Fatalf("permalink = %q, want %q", got, url)
+			}
 			response := httptest.NewRecorder()
-			app.Home().ServeHTTP(response, httptest.NewRequest(http.MethodGet, url, nil))
+			routes.ServeHTTP(response, httptest.NewRequest(http.MethodGet, url, nil))
 			if response.Code != http.StatusOK {
 				t.Fatalf("status = %d, want 200", response.Code)
 			}
@@ -46,6 +52,57 @@ func TestQuoteOpenGraphMetadata(t *testing.T) {
 	}
 }
 
+func TestQuoteRoutes(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "quotes")
+	if err := os.WriteFile(path, []byte("First quote\n%\nSecond quote\n%\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	app := NewApplication(path, "https://fortune.example")
+	routes := app.routes()
+	quote := app.quotesfile.AllQuotes()[0]
+	canonical := quote.Permalink(app.pageParameters.HostRoot)
+
+	for _, test := range []struct {
+		name, url, location string
+		status              int
+	}{
+		{"legacy query", "https://fortune.example/?id=" + quote.HashString(), canonical, http.StatusMovedPermanently},
+		{"uppercase path", "https://fortune.example/q/" + strings.ToUpper(quote.HashString()), canonical, http.StatusMovedPermanently},
+		{"random root", "https://fortune.example/", "", http.StatusFound},
+		{"invalid legacy hash", "https://fortune.example/?id=invalid", "", http.StatusNotFound},
+		{"empty legacy hash", "https://fortune.example/?id=", "", http.StatusNotFound},
+		{"invalid path hash", "https://fortune.example/q/invalid", "", http.StatusNotFound},
+		{"unknown path hash", "https://fortune.example/q/00000000000000000000000000000000", "", http.StatusNotFound},
+		{"unknown path", "https://fortune.example/unknown", "", http.StatusNotFound},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			response := httptest.NewRecorder()
+			routes.ServeHTTP(response, httptest.NewRequest(http.MethodGet, test.url, nil))
+			if response.Code != test.status {
+				t.Errorf("status = %d, want %d", response.Code, test.status)
+			}
+			if test.location != "" && response.Header().Get("Location") != test.location {
+				t.Errorf("Location = %q, want %q", response.Header().Get("Location"), test.location)
+			}
+			if test.name == "random root" {
+				location := response.Header().Get("Location")
+				if _, ok := quoteForURL(app, location); !ok {
+					t.Errorf("random redirect location = %q, want known quote permalink", location)
+				}
+			}
+		})
+	}
+}
+
+func quoteForURL(app *Application, url string) (quotesfile.Quote, bool) {
+	for _, quote := range app.quotesfile.AllQuotes() {
+		if quote.Permalink(app.pageParameters.HostRoot) == url {
+			return quote, true
+		}
+	}
+	return quotesfile.Quote{}, false
+}
+
 func TestAllQuotesImageDownloadLinks(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "quotes")
 	if err := os.WriteFile(path, []byte("First quote\n%\nSecond quote\n%\n"), 0o600); err != nil {
@@ -62,6 +119,25 @@ func TestAllQuotesImageDownloadLinks(t *testing.T) {
 		if !strings.Contains(response.Body.String(), link) {
 			t.Errorf("all quotes page missing image download link %q", link)
 		}
+		if !strings.Contains(response.Body.String(), quote.Permalink(app.pageParameters.HostRoot)) {
+			t.Errorf("all quotes page missing quote permalink %q", quote.Permalink(app.pageParameters.HostRoot))
+		}
+	}
+}
+
+func TestHTMLQuotePushesPathPermalink(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "quotes")
+	if err := os.WriteFile(path, []byte("First quote\n%\nSecond quote\n%\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	app := NewApplication(path, "https://fortune.example")
+	response := httptest.NewRecorder()
+	app.routes().ServeHTTP(response, httptest.NewRequest(http.MethodGet, "https://fortune.example/html", nil))
+	if response.Code != http.StatusOK {
+		t.Fatalf("status = %d, want 200", response.Code)
+	}
+	if _, ok := quoteForURL(app, response.Header().Get("HX-Push-Url")); !ok {
+		t.Errorf("HX-Push-Url = %q, want known quote permalink", response.Header().Get("HX-Push-Url"))
 	}
 }
 

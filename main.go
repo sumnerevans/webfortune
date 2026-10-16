@@ -54,22 +54,37 @@ func (a *Application) quoteByHash(hashString string) (quotesfile.Quote, bool) {
 	return a.quotesfile.GetQuoteByHash([16]byte(hash))
 }
 
-func (a *Application) Home() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func (a *Application) Home(w http.ResponseWriter, r *http.Request) {
+	if _, hasID := r.URL.Query()["id"]; hasID {
 		quote, ok := a.quoteByHash(r.URL.Query().Get("id"))
 		if !ok {
-			quote = a.quotesfile.GetRandomQuote()
-			http.Redirect(w, r, quote.Permalink(a.pageParameters.HostRoot), http.StatusFound)
+			http.NotFound(w, r)
 			return
 		}
+		http.Redirect(w, r, quote.Permalink(a.pageParameters.HostRoot), http.StatusMovedPermanently)
+		return
+	}
+	quote := a.quotesfile.GetRandomQuote()
+	http.Redirect(w, r, quote.Permalink(a.pageParameters.HostRoot), http.StatusFound)
+}
 
-		err := templates.Home(templates.HomePageParameters{
-			PageParameters: a.pageParameters,
-			Quote:          quote,
-		}).Render(r.Context(), w)
-		if err != nil {
-			log.Err(err).Msg("Failed to execute the template")
-		}
+func (a *Application) Quote(w http.ResponseWriter, r *http.Request) {
+	quote, ok := a.quoteByHash(r.PathValue("hash"))
+	if !ok {
+		http.NotFound(w, r)
+		return
+	}
+	if r.PathValue("hash") != quote.HashString() {
+		http.Redirect(w, r, quote.Permalink(a.pageParameters.HostRoot), http.StatusMovedPermanently)
+		return
+	}
+
+	err := templates.Home(templates.HomePageParameters{
+		PageParameters: a.pageParameters,
+		Quote:          quote,
+	}).Render(r.Context(), w)
+	if err != nil {
+		log.Err(err).Msg("Failed to execute the template")
 	}
 }
 
@@ -149,20 +164,25 @@ func (a *Application) HTMLQuote(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (a *Application) Start(listen string) {
-	log.Info().Msg("Starting router")
+func (a *Application) routes() http.Handler {
+	mux := http.NewServeMux()
 
-	http.Handle("/", a.Home())
-	http.HandleFunc("/all", a.AllQuotes)
-	http.HandleFunc("/raw", a.RawQuote)
-	http.HandleFunc("/html", a.HTMLQuote)
-	http.HandleFunc("/og-image.png", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("GET /{$}", a.Home)
+	mux.HandleFunc("GET /q/{hash}", a.Quote)
+	mux.HandleFunc("/all", a.AllQuotes)
+	mux.HandleFunc("/raw", a.RawQuote)
+	mux.HandleFunc("/html", a.HTMLQuote)
+	mux.HandleFunc("/og-image.png", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeContent(w, r, "og-image.png", time.Time{}, bytes.NewReader(ogImage))
 	})
-	http.HandleFunc("GET /og/v6/{hash}", a.OGImage)
+	mux.HandleFunc("GET /og/v6/{hash}", a.OGImage)
+	return mux
+}
 
+func (a *Application) Start(listen string) {
+	log.Info().Msg("Starting router")
 	log.Info().Str("listen", listen).Msg("Starting server")
-	err := http.ListenAndServe(listen, nil)
+	err := http.ListenAndServe(listen, a.routes())
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to start server")
 	}
